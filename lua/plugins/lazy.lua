@@ -160,4 +160,5 @@ require('lazy').setup({
     end,
   },
   { 'tpope/vim-fugitive' },
+  { "folke/twilight.nvim", opts = {}},
 })
