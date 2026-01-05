@@ -31,3 +31,8 @@ vim.keymap.set('n', '<leader>gb', ':Gitsigns toggle_current_line_blame<CR>' )
 --twilight
 vim.keymap.set('n', '<leader>te', ':TwilightEnable<CR>' )
 vim.keymap.set('n', '<leader>td', ':TwilightDisable<CR>' )
+
+--liveserver
+-- vim.keymap.set('n', '<leader>lp', ':LivePreview<CR>', { desc = "Toggle Live Preview" })
+vim.keymap.set('n', '<leader>lp', ':LivePreview start<CR>', { desc = "Start Live Preview" })
+vim.keymap.set('n', '<leader>ls', ':LivePreview close<CR>', { desc = "Stop Live Preview" })

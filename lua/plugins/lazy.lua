@@ -47,24 +47,25 @@ require('lazy').setup({
       require('nvim_comment').setup({create_mappings = false})
     end
   },
-  {
-    'VonHeikemen/lsp-zero.nvim',
-    branch = 'v3.x',
-    lazy = true,
-    config = false,
-    init = function()
-      vim.g.lsp_zero_extend_cmp = 0
-      vim.g.lsp_zero_extend_lspconfig = 0
-    end,
-  },
-  {
-    'williamboman/mason.nvim',
-    lazy = false,
-    opts = {},
-  },
+  -- {
+    --   'VonHeikemen/lsp-zero.nvim',
+    --   branch = 'v3.x',
+    --   lazy = true,
+    --   config = false,
+    --   init = function()
+    --     vim.g.lsp_zero_extend_cmp = 0
+    --     vim.g.lsp_zero_extend_lspconfig = 0
+    --   end,
+    -- },
+    {
+      'williamboman/mason.nvim',
+      opts = {
+        ensure_installed = { 'ts_ls', 'pyright', 'html', 'cssls', 'emmet_ls' },
+      },
+    },
 
-  -- Autocompletion
-  {
+    -- Autocompletion
+    {
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
     dependencies = { 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
@@ -110,47 +111,50 @@ require('lazy').setup({
   },
   {
     'neovim/nvim-lspconfig',
-    cmd = { 'LspInfo', 'LspInstall', 'LspStart' },
-    event = { 'BufReadPre', 'BufNewFile' },
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
       'williamboman/mason.nvim',
-      'williamboman/mason-lspconfig.nvim',
     },
     init = function()
+      -- Always show the sign column (where icons like errors/warnings appear)
       vim.opt.signcolumn = 'yes'
     end,
     config = function()
-      local lsp_defaults = require('lspconfig').util.default_config
-      lsp_defaults.capabilities = vim.tbl_deep_extend(
-        'force',
-        lsp_defaults.capabilities,
-        require('cmp_nvim_lsp').default_capabilities()
-      )
+      -- 1. Get completion capabilities from nvim-cmp
+      local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+      -- 2. NEW: Set global configuration for all LSP servers.
+      -- This replaces the need to pass 'capabilities' to every single server setup.
+      vim.lsp.config('*', { 
+        capabilities = capabilities 
+      })
+
+      -- 3. Define keymaps that only activate when an LSP is attached to a file.
       vim.api.nvim_create_autocmd('LspAttach', {
         desc = 'LSP actions',
         callback = function(event)
           local opts = { buffer = event.buf }
-          vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
-          vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
-          vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
-          vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
-          vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
-          vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
-          vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
-          vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
-          vim.keymap.set({ 'n', 'x' }, '<F3>', '<cmd>lua vim.lsp.buf.format({ async = true })<cr>', opts)
-          vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+
+          -- Simplified function calls instead of <cmd> strings
+          vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+          vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+          vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+          vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+          vim.keymap.set('n', 'go', vim.lsp.buf.type_definition, opts)
+          vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+          vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, opts)
+          vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, opts)
+          vim.keymap.set({ 'n', 'x' }, '<F3>', function() vim.lsp.buf.format({ async = true }) end, opts)
+          vim.keymap.set('n', '<F4>', vim.lsp.buf.code_action, opts)
         end,
       })
-      require('mason-lspconfig').setup({
-        ensure_installed = { 'ts_ls', 'pyright', 'html', 'cssls' },
-        handlers = {
-          function(server_name)
-            require('lspconfig')[server_name].setup({})
-          end,
-        }
-      })
+
+      -- 4. NEW: Enable your servers using the native Neovim 0.11 API.
+      -- This replaces: require('lspconfig').ts_ls.setup({})
+      local servers = { 'ts_ls', 'pyright', 'html', 'cssls', 'emmet_ls' }
+      for _, server in ipairs(servers) do
+        vim.lsp.enable(server)
+      end
     end,
   },
   {
@@ -164,5 +168,29 @@ require('lazy').setup({
   {
     'fei6409/log-highlight.nvim',
     opts = {},
+  },
+  {
+    "L3MON4D3/LuaSnip",
+    event = "InsertEnter",
+    dependencies = { "rafamadriz/friendly-snippets" },
+    config = function()
+      require("luasnip.loaders.from_vscode").lazy_load()
+    end,
+  },
+  {
+    "saadparwaiz1/cmp_luasnip",
+  },
+  {
+    "rafamadriz/friendly-snippets",  -- optional
+    lazy = true,
+  },
+  {
+    "brianhuster/live-preview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = { "LivePreview" },
+    opts = {
+      port = 5500,
+      browser = "default", -- or "firefox", "chrome", etc.
+    },
   },
 })
