@@ -25,6 +25,7 @@ vim.keymap.set('n', '<leader>ha', ':lua vim.lsp.buf.code_action()<CR>' )
 vim.keymap.set('n', '<leader>gp', ':Gitsigns preview_hunk<CR>' )
 vim.keymap.set('n', '<leader>gl', ':Gitsigns preview_hunk_inline<CR>' )
 vim.keymap.set('n', '<leader>gr', ':Gitsigns reset_hunk<CR>' )
+vim.keymap.set('n', '<leader>gb', ':Gitsigns toggle_current_line_blame<CR>' )
 
 
 --twilight

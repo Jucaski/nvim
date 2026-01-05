@@ -161,4 +161,8 @@ require('lazy').setup({
   },
   { 'tpope/vim-fugitive' },
   { "folke/twilight.nvim", opts = {}},
+  {
+    'fei6409/log-highlight.nvim',
+    opts = {},
+  },
 })
