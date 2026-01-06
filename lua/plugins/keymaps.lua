@@ -35,4 +35,4 @@ vim.keymap.set('n', '<leader>td', ':TwilightDisable<CR>' )
 --liveserver
 -- vim.keymap.set('n', '<leader>lp', ':LivePreview<CR>', { desc = "Toggle Live Preview" })
 vim.keymap.set('n', '<leader>lp', ':LivePreview start<CR>', { desc = "Start Live Preview" })
-vim.keymap.set('n', '<leader>ls', ':LivePreview close<CR>', { desc = "Stop Live Preview" })
+vim.keymap.set('n', '<leader>lc', ':LivePreview close<CR>', { desc = "Stop Live Preview" })
