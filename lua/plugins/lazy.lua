@@ -17,7 +17,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
   {
-    'nvim-telescope/telescope.nvim', tag = '0.1.8',
+    'nvim-telescope/telescope.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' }
   },
   {
@@ -193,4 +193,57 @@ require('lazy').setup({
       browser = "default", -- or "firefox", "chrome", etc.
     },
   },
+  {
+    "hiphish/rainbow-delimiters.nvim",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+    config = function()
+      local rb = require('rainbow-delimiters')
+      vim.g.rainbow_delimiters = {
+        strategy = {
+          [''] = rb.strategy['global'],
+          html = rb.strategy['global'],
+        },
+        query = {
+          [''] = 'rainbow-delimiters',
+          lua = 'rainbow-blocks',
+        },
+        highlight = {
+          'RainbowDelimiterRed',
+          'RainbowDelimiterYellow',
+          'RainbowDelimiterBlue',
+          'RainbowDelimiterOrange',
+          'RainbowDelimiterGreen',
+          'RainbowDelimiterViolet',
+          'RainbowDelimiterCyan',
+        },
+      }
+    end
+  },
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    opts = {
+      scope = {
+        enabled = true,
+        show_start = false,
+        show_end = false,
+      },
+      exclude = {
+        filetypes = {
+          "help",
+          "terminal",
+          "lazy",
+          "lspinfo",
+          "TelescopePrompt",
+          "TelescopeResults",
+        },
+        buftypes = {
+          "terminal",
+          "nofile",
+          "quickfix",
+          "prompt",
+        },
+      },
+    },
+  }
 })
